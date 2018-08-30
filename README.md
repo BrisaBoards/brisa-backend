@@ -25,9 +25,9 @@ attempting to install and run Brisa, please file an issue. This process will be 
 4. Check out the brisa-backend repository.
 5. Run bundle install to install dependencies.
 6. Configure the config/database.yml file with your postgres config. Configure the master key
-   and credentials. (TODO: Make this step way easier!)
+   and credentials. (TODO: Figure out the exact steps required.)
 7. Run rake db:migrate to create tables.
-8 You can run ./add-admin-user.sh <email> (in Linux/OSX) to setup an admin user and pass.
+8. You can run ./add-admin-user.sh <email> (in Linux/OSX) to setup an admin user and pass.
 9. Run rails server to start the development server.
 10. If you have checked out the brisa-frontend code, a few lines of poi need to be patched to build
     to access the backend. poi --vars.BACKEND=http://localhost:3000/brisa build will
