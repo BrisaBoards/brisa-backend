@@ -15,7 +15,7 @@ version 9 or higher due to the use of array and jsonb columns.
 
 ### Setup Process
 
-This process is a bit short. Hopefully it can be expanded later. If you have specific issues while
+This process is a bit confusing and lacking detail. If you have specific issues while
 attempting to install and run Brisa, please file an issue. This process will be made easier!
 
 1. Make sure postgresql is installed and running. Add a user and database for brisa.
