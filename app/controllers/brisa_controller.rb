@@ -1,6 +1,7 @@
 
 class BrisaController < ApplicationController
-  # TODO: Eager load API classes so BrisaApiDispatcher will have access to them.
+  # TODO: Refactor API so functions are included directly in controller
+  # and has access to all controller data.
   BrisaEntry; BrisaUser; BrisaModel; BrisaUserSetting;
 
   skip_before_action :verify_authenticity_token
@@ -13,6 +14,7 @@ class BrisaController < ApplicationController
     begin
       render json: {data: BrisaApiDispatcher.singleton.do_call(params, current_user, self, params[:namespace])}
     rescue BrisaApiError => e
+      # TODO: Refactor exceptions to include an error code (:not_found, :access_denied, etc)
       render status: :error, json: e.error_data
     rescue StandardError => e
       render status: :error, json: {error: Rails.env == 'development' ? "Internal error: #{e.message}" : 'Internal error'}

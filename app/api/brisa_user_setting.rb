@@ -8,10 +8,12 @@ class BrisaUserSetting < BrisaAPIBase
   api_action 'destroy', args: %w(id)
 
   def self.all(params, user, ctx)
+    raise BrisaApiError.new('Access denied') unless user
     UserSetting.where(user_id: user.id)
   end
 
   def self.update(params, user, ctx)
+    raise BrisaApiError.new('Access denied') unless user
     setting = UserSetting.where(id: params['id'], user_id: user.id).first
     setting.update!(name: params[:data][:name], setting: params[:data][:setting])
     setting
