@@ -1,14 +1,14 @@
 class BrisaEntry < BrisaAPIBase
   api_namespace 'Brisa0'
-  api_object 'Entry'
+  api_object 'Entry', attrs: %w(title description metadata tags classes created_at updated_at)
 
-  api_action 'search', args: %w(tags classes)
-  api_action 'create', args: 'data'
-  api_action 'update', args: 'data'
-  api_action 'add_tags', args: 'data'
-  api_action 'remove_tags', args: 'data'
-  api_action 'edit_class', args: 'data'
-  api_action 'destroy', args: 'data'
+  api_action 'search', args: %w(tags classes), returns: ['Entry']
+  api_action 'create', args: %w(data), returns: 'Entry'
+  api_action 'update', args: %w(id data), instance: :id, include_data: :data, returns: :self
+  api_action 'add_tags', args: %w(id tags), instance: :id
+  api_action 'remove_tags', args: %w(id tags), instance: :id
+  api_action 'edit_class', args: %w(id class_name cfg), instance: :id, returns: :data
+  api_action 'destroy', args: %w(id), instance: :id
 
   def self.add_tags(params, user, ctx)
     entry = Entry.find(params['id'])

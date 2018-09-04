@@ -6,8 +6,6 @@ class BrisaController < ApplicationController
 
   skip_before_action :verify_authenticity_token
 
-  def get_binding; binding; end
-
   def api_request
     # TODO: If API token is provided, use that. Otherwise, verify auth token and set user.
 
@@ -25,6 +23,17 @@ class BrisaController < ApplicationController
 private
 
   def current_user
+    if params[:auth_token]
+      begin
+        token_data = JWT.decode(params[:auth_token], Rails.application.credentials.secret_key_base)[0]
+        return User.where(id: token_data['user_id']).first
+      rescue StandardError => e
+        logger.info(e)
+        return nil
+      end
+    end
+
+    return nil
     if session[:user_id]
       return User.where(id: session[:user_id]).first
     end

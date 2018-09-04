@@ -1,0 +1,24 @@
+<h2>Brisa Library Generator</h2>
+
+<h3>Languages</h3>
+
+<% @dispatcher.ns.keys.each do |ns| %>
+<div style="margin-left: 10px;">
+<h3><%= ns %></h3>
+  <div>
+    <%= link_to 'Ruby', library_generator_path("#{ns}:ruby") %> |
+    <%= link_to 'JavaScript', library_generator_path("#{ns}:javascript") %> |
+  </div>
+
+  <% @dispatcher.ns[ns].objects.keys.each do |obj| %>
+    <div style="margin-left: 10px;">
+    <h4><%= obj %></h4>
+
+    <% @dispatcher.ns[ns].objects[obj].actions.keys.each do |act| %>
+      <div style="margin-left: 10px;"><%= act %>
+        <%= @dispatcher.ns[ns].objects[obj].actions[act][:opts] %></div>
+    <% end %>
+    </div>
+  <% end %>
+</div>
+<% end %>

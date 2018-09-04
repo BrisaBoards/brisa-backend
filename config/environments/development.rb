@@ -1,14 +1,16 @@
 Rails.application.configure do
   # Settings specified here will take precedence over those in config/application.rb.
 
+  # Load encrypted credentials.
+  config.require_master_key = true
+
   # In development, allow CORS for easier frontend development
   config.middleware.insert_before 0, Rack::Cors do
     allow do
       origins 'localhost:4000'
       resource '*',
         headers: :any,
-        methods: %i(get post put patch delete options head),
-        credentials: true
+        methods: %i(get post put patch delete options head)
     end
   end
 

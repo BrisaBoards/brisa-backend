@@ -13,6 +13,7 @@ end
 
 class BrisaApiDispatcher
   @@singleton = nil
+  attr_accessor :ns
 
   def self.singleton
     @@singleton ||= BrisaApiDispatcher.new()

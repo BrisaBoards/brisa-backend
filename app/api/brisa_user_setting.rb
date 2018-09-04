@@ -1,10 +1,10 @@
 class BrisaUserSetting < BrisaAPIBase
   api_namespace 'Brisa0'
-  api_object 'UserSetting'
+  api_object 'UserSetting', attrs: %w(user_id name setting)
 
-  api_action 'all', args: %w()
-  api_action 'create', args: %w()
-  api_action 'update', args: %w(id name setting)
+  api_action 'all', args: %w(), returns: ['UserSetting']
+  api_action 'create', args: %w(name setting), returns: 'UserSetting'
+  api_action 'update', args: %w(id name setting), returns: :self
   api_action 'destroy', args: %w(id)
 
   def self.all(params, user, ctx)

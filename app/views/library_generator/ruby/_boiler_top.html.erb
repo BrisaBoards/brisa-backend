@@ -1,0 +1,92 @@
+# Brisa <%= @lang %> client library, Version <%= @namespace %>.
+# Auto-generated on <%= Time.now.to_date.to_s %>
+
+require 'httparty'
+
+class Brisa
+  def initialize(url, add_args={})
+    @url = url
+    @add_args = add_args
+  end
+
+<% @objs.each do |obj| %>
+  def <%= obj %>
+    @brisa_<%= obj %>_parent ||= Brisa<%= obj %>Parent.new(self)
+  end
+<% end %>
+
+  def request(action, args)
+    new_args = @add_args.merge(args)
+    return JSON.parse(HTTParty.post(@url + '/' + action, body: new_args.to_json, headers: {'Content-Type': 'application/json'}).body)
+  end
+
+  def HandleResult(data, brisa_cls=nil, is_array=false, self_inst=nil)
+    data = data['data']
+    if (self_inst)
+      self_inst.data = data;
+      return self_inst;
+    end
+
+    if is_array
+      results = []
+      data.each do |inst_data|
+        results.push(brisa_cls.nil? ? inst_data : brisa_cls.new(self, inst_data))
+      end
+      return results
+    end
+
+    return brisa_cls.nil? ? data : brisa_cls.new(self, data)
+  end
+end
+
+<% @objs.each do |obj| %>
+class Brisa<%= obj %>Parent
+  def initialize(brisa)
+    @brisa = brisa
+  end
+
+<% ObjActions(obj).each do |act|
+  action = ActionOpts(obj, act)
+%>
+  def <%= act %>(<%= Array(action[:args]).join(', ') %>)
+    send_args = { <%= action[:args].map {|a| "#{a}: #{a}" }.join(", ") %> }
+    @brisa.HandleResult(@brisa.request('<%= obj %>:<%= act %>', send_args),
+        <%= ActionReturnType(action, 'nil') %>, <%= action[:returns].is_a?(Array) ? 'true' : 'false' %>)
+  end
+<% end %>
+end
+
+<% end %>
+
+<% @objs.each do |obj| %>
+class Brisa<%= obj %>
+  attr_accessor :data
+  def initialize(brisa, data={})
+    @data = data
+    @brisa = brisa
+  end
+
+  def id; return @data['id']; end
+
+<% (@ns.objects[obj].opts[:attrs] || []).each do |attr| %>
+  def <%= attr %>; return @data['<%= attr %>']; end
+  def <%= attr %>=(new_<%= attr %>); @data['<%= attr %>'] = new_<%= attr %>; end
+
+<% end %>
+<% InstanceMethods(obj).each do |method,attrs|
+  inst_args = InstanceArgs(attrs)
+%>
+  def <%= method %>(<%= inst_args.join(", ") %>)
+    send_args = { <%= attrs[:args].map {|a|
+      "#{a}: " + (inst_args.include?(a) ? a : (attrs[:include_data].to_s == a ? '@data' : "@data['#{a}']"))
+      }.join(", ").html_safe
+    %> }
+    @brisa.HandleResult(@brisa.request('<%= obj %>:<%= method%>', send_args),
+        <%= ActionReturnType(attrs, 'nil') %>, <%= attrs[:returns].is_a?(Array) ? 'true' : 'false' -%>
+<%= attrs[:returns] == :self ? ', self' : '' %>)
+  end
+
+<% end %>
+end
+
+<% end %>
