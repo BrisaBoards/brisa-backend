@@ -1,22 +1,23 @@
 <h2>Brisa Library Generator</h2>
 
-<h3>Languages</h3>
+<h3>Namespaces</h3>
 
 <% @dispatcher.ns.keys.each do |ns| %>
 <div style="margin-left: 10px;">
 <h3><%= ns %></h3>
   <div>
     <%= link_to 'Ruby', library_generator_path("#{ns}:ruby") %> |
-    <%= link_to 'JavaScript', library_generator_path("#{ns}:javascript") %> |
+    <%= link_to 'JavaScript', library_generator_path("#{ns}:javascript") %>
   </div>
 
   <% @dispatcher.ns[ns].objects.keys.each do |obj| %>
     <div style="margin-left: 10px;">
-    <h4><%= obj %></h4>
+    <h4><%= obj %> { <%= @dispatcher.ns[ns].objects[obj].opts[:attrs].join(", ") %> }</h4>
 
     <% @dispatcher.ns[ns].objects[obj].actions.keys.each do |act| %>
       <div style="margin-left: 10px;"><%= act %>
-        <%= @dispatcher.ns[ns].objects[obj].actions[act][:opts] %></div>
+        { <%= @dispatcher.ns[ns].objects[obj].actions[act][:opts][:args].join(", ") %> }
+        <%# @dispatcher.ns[ns].objects[obj].actions[act][:opts] %></div>
     <% end %>
     </div>
   <% end %>

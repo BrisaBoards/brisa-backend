@@ -68,7 +68,7 @@ class BrisaEntry < BrisaAPIBase
     data[:metadata] ||= {}
     opts = { owner_id: user.id, creator_id: user.id,
       title: data[:title], description: data[:description],
-      tags: data[:tags], classes: data[:classes],
+      tags: Array(data[:tags]), classes: data[:classes],
       metadata: data[:metadata]}
     Entry.create(opts)
   end

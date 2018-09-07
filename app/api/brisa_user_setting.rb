@@ -4,8 +4,8 @@ class BrisaUserSetting < BrisaAPIBase
 
   api_action 'all', args: %w(), returns: ['UserSetting']
   api_action 'create', args: %w(name setting), returns: 'UserSetting'
-  api_action 'update', args: %w(id name setting), returns: :self
-  api_action 'destroy', args: %w(id)
+  api_action 'update', args: %w(id data), instance: :id, returns: :self, include_data: :data
+  api_action 'destroy', args: %w(id), instance: :id
 
   def self.all(params, user, ctx)
     raise BrisaApiError.new('Access denied') unless user

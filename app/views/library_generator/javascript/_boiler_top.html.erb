@@ -1,0 +1,85 @@
+// Brisa <%= @lang %> client library, Version <%= @namespace %>.
+// Auto-generated on <%= Time.now.to_date.to_s %>
+
+var BrisaAPI = {
+  _include: {}
+};
+
+BrisaAPI.HandleResult = function(result, d_type, is_array, o_self) {
+  if (is_array) {
+    var results = [];
+    for (var i in result.data) {
+      results.push(d_type ? new d_type(result.data[i]) : result.data);
+    }
+    return results;
+  } else if (o_self != undefined) {
+    o_self.data = result.data;
+    return o_self;
+  } else {
+    return (d_type != null ? new d_type(result.data) : result);
+  }
+};
+
+BrisaAPI.Request = function(action, args) {
+  send_args = {};
+  for (var i in BrisaAPI._include) { send_args[i] = BrisaAPI._include[i] };
+  for (var i in args) { send_args[i] = args[i] };
+  if (BrisaAPI._api_path)
+    return $.ajax({
+      type: 'POST', url: BrisaAPI._api_path + '/' + action,
+      contentType: "application/json; charset=utf-8",
+      data: JSON.stringify(send_args),
+    });
+  else
+    return BrisaAPI._brisa_idb.dispatch(action, send_args);
+};
+
+BrisaAPI.SendRequest = function(action, args, ret_type, is_array, o_self) {
+  return new Promise(function(resolve, reject) {
+    BrisaAPI.Request(action, args).then(function(r) {
+      resolve(BrisaAPI.HandleResult(r, ret_type, is_array, o_self));
+    }).catch(function(r) {
+      reject(r);
+    });
+  });
+};
+
+<% @objs.each do |obj| %>
+BrisaAPI.<%= obj %> = function(state) { this.data = state;};
+
+<% ObjActions(obj).each do |act|
+  action = ActionOpts(obj, act)
+%>
+BrisaAPI.<%= obj %>.<%= act %> = function(<%= Array(action[:args]).join(', ') %>) {
+  var args = { <%= action[:args].map {|a| "#{a}: #{a}" }.join(", ") %> };
+  return BrisaAPI.SendRequest('<%= obj %>:<%= act %>', args, <%= ActionReturnType(action, 'null', 'BrisaAPI.') %>, <%= action[:returns].is_a?(Array) ? 'true' : 'false' %>);
+};
+
+<% end %>
+
+<% end %>
+
+<% @objs.each do |obj| %>
+BrisaAPI.<%= obj %>.prototype.id = function() { return this.data,id }
+
+<% (@ns.objects[obj].opts[:attrs] || []).each do |attr| %>
+BrisaAPI.<%= obj %>.prototype.<%= attr %> = function(new_val) {
+  if (new_val !== undefined) this.data['<%= attr %>'] = new_val;
+  return this.data['<%= attr %>'];
+};
+
+<% end %>
+<% InstanceMethods(obj).each do |method,attrs|
+  inst_args = InstanceArgs(attrs)
+%>
+BrisaAPI.<%= obj %>.prototype.<%= method %> = function(<%= inst_args.join(', ') %>) {
+  var args = { <%= attrs[:args].map {|a|
+      "#{a}: " + (inst_args.include?(a) ? a : (attrs[:include_data].to_s == a ? 'this.data' : "this.data.#{a}"))
+  }.join(', ').html_safe %> }
+  return BrisaAPI.SendRequest('<%= obj %>:<%= method %>', args, <%= ActionReturnType(attrs, 'null', 'BrisaAPI.') %>, <%= attrs[:returns].is_a?(Array) ? 'true' : 'false' -%>
+<%= attrs[:returns] == :self ? ', this' : '' %>);
+};
+
+<% end %>
+
+<% end %>

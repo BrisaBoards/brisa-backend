@@ -4,6 +4,7 @@
 require 'httparty'
 
 class Brisa
+  attr_accessor :add_args
   def initialize(url, add_args={})
     @url = url
     @add_args = add_args

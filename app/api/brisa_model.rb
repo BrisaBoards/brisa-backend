@@ -3,7 +3,7 @@ class BrisaModel < BrisaAPIBase
   api_object 'Model', attrs: %w(unique_id title config)
 
   api_action 'all', args: %w(), returns: ['Model']
-  api_action 'create', args: %w(data), returns: ['Model']
+  api_action 'create', args: %w(data), returns: 'Model'
   api_action 'update', args: %w(id data), instance: :id, include_data: :data, returns: :self
 
   def self.all(params, user, ctx)
