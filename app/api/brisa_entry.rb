@@ -5,9 +5,9 @@ class BrisaEntry < BrisaAPIBase
   api_action 'search', args: %w(tags classes), returns: ['Entry']
   api_action 'create', args: %w(data), returns: 'Entry'
   api_action 'update', args: %w(id data), instance: :id, include_data: :data, returns: :self
-  api_action 'add_tags', args: %w(id tags), instance: :id
-  api_action 'remove_tags', args: %w(id tags), instance: :id
-  api_action 'edit_class', args: %w(id class_name cfg), instance: :id, returns: :data
+  api_action 'add_tags', args: %w(id tags), instance: :id, returns: :self
+  api_action 'remove_tags', args: %w(id tags), instance: :id, returns: :self
+  api_action 'edit_class', args: %w(id class_name cfg), instance: :id, returns: :self
   api_action 'destroy', args: %w(id), instance: :id
 
   def self.add_tags(params, user, ctx)
@@ -68,7 +68,7 @@ class BrisaEntry < BrisaAPIBase
     data[:metadata] ||= {}
     opts = { owner_id: user.id, creator_id: user.id,
       title: data[:title], description: data[:description],
-      tags: Array(data[:tags]), classes: data[:classes],
+      tags: Array(data[:tags]), classes: Array(data[:classes]),
       metadata: data[:metadata]}
     Entry.create(opts)
   end

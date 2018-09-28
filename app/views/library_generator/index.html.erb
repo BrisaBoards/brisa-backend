@@ -8,6 +8,7 @@
   <div>
     <%= link_to 'Ruby', library_generator_path("#{ns}:ruby") %> |
     <%= link_to 'JavaScript', library_generator_path("#{ns}:javascript") %>
+    <%= link_to 'Python', library_generator_path("#{ns}:python") %>
   </div>
 
   <% @dispatcher.ns[ns].objects.keys.each do |obj| %>
