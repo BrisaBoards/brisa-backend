@@ -1,6 +1,6 @@
 # BrisaBoards Backend
 
-This is the Ruby on Rails backend for http://BrisaBoards.com.
+This is the Ruby on Rails backend for https://BrisaBoards.com.
 
 ## Development
 
