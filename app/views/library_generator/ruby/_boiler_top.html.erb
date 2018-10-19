@@ -3,6 +3,16 @@
 
 require 'httparty'
 
+class BrisaAPIError < StandardError
+  attr_accessor :message, :code, :json
+  def initialize(message, code, json)
+    @message = message
+    @code = code
+    @json = json
+    super(message)
+  end
+end
+
 class Brisa
   attr_accessor :add_args
   def initialize(url, add_args={})
@@ -18,7 +28,16 @@ class Brisa
 
   def request(action, args)
     new_args = @add_args.merge(args)
-    return JSON.parse(HTTParty.post(@url + '/' + action, body: new_args.to_json, headers: {'Content-Type': 'application/json'}).body)
+    response = HTTParty.post(@url + '/' + action, body: new_args.to_json, headers: {'Content-Type': 'application/json'})
+    begin
+      json = JSON.parse(response.body)
+    rescue JSON::ParserError
+      json = {}
+    end
+    if response.code >= 300 or response.code < 200
+      raise BrisaAPIError.new(json['error'], response.code, json)
+    end
+    return json
   end
 
   def HandleResult(data, brisa_cls=nil, is_array=false, self_inst=nil)

@@ -16,8 +16,8 @@ ActiveRecord::Schema.define(version: 2018_08_28_020622) do
   enable_extension "plpgsql"
 
   create_table "entries", force: :cascade do |t|
-    t.integer "owner_id"
-    t.integer "creator_id"
+    t.string "owner_uid"
+    t.string "creator_uid"
     t.integer "group_id"
     t.string "title"
     t.text "description"
@@ -27,22 +27,24 @@ ActiveRecord::Schema.define(version: 2018_08_28_020622) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["classes"], name: "index_entries_on_classes", using: :gin
+    t.index ["creator_uid"], name: "index_entries_on_creator_uid"
     t.index ["group_id"], name: "index_entries_on_group_id"
-    t.index ["owner_id"], name: "index_entries_on_owner_id"
+    t.index ["owner_uid"], name: "index_entries_on_owner_uid"
     t.index ["tags"], name: "index_entries_on_tags", using: :gin
   end
 
   create_table "user_groups", force: :cascade do |t|
-    t.integer "user_id"
+    t.string "owner_uid"
     t.string "name"
     t.jsonb "access"
+    t.jsonb "settings"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
-    t.index ["user_id"], name: "index_user_groups_on_user_id"
+    t.index ["owner_uid"], name: "index_user_groups_on_owner_uid"
   end
 
   create_table "user_models", force: :cascade do |t|
-    t.integer "owner_id"
+    t.string "owner_uid"
     t.integer "group_id"
     t.string "title"
     t.jsonb "config"
@@ -50,7 +52,7 @@ ActiveRecord::Schema.define(version: 2018_08_28_020622) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["group_id"], name: "index_user_models_on_group_id"
-    t.index ["owner_id"], name: "index_user_models_on_owner_id"
+    t.index ["owner_uid"], name: "index_user_models_on_owner_uid"
   end
 
   create_table "user_settings", force: :cascade do |t|
@@ -63,6 +65,7 @@ ActiveRecord::Schema.define(version: 2018_08_28_020622) do
   end
 
   create_table "users", force: :cascade do |t|
+    t.string "uid"
     t.string "alias"
     t.string "email"
     t.boolean "confirmed"

@@ -7,7 +7,7 @@ Rails.application.configure do
   # In development, allow CORS for easier frontend development
   config.middleware.insert_before 0, Rack::Cors do
     allow do
-      origins 'localhost:4000'
+      origins '*'
       resource '*',
         headers: :any,
         methods: %i(get post put patch delete options head)

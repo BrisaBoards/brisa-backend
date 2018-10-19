@@ -4,7 +4,14 @@ class BrisaUser < BrisaAPIBase
 
   api_action 'status', args: %w(renew)
   api_action 'login', args: %w(email password), returns: 'User'
+  api_action 'groups', args: %w(), returns: ['Group']
   api_action 'logout', args: %w()
+
+  def self.groups(params, user, ctx)
+    raise BrisaAPIError.new('Access denied') unless user
+    (UserGroup.where(owner_uid: user.uid) +
+      UserGroup.where("access -> ? is not null", user.uid.to_s)).map &:to_json
+  end
 
   def self.status(params, user, ctx)
     token =  params[:auth_token]
@@ -12,7 +19,7 @@ class BrisaUser < BrisaAPIBase
       if params[:renew]
         token = create_token(user.id)
       end
-      return { id: user.id, alias: user.alias, email: user.email, admin: user.admin, logged_in: true, auth_token: token }
+      return { id: user.id, uid: user.uid, alias: user.alias, email: user.email, admin: user.admin, logged_in: true, auth_token: token }
     end
     return { logged_in: false}
   end
