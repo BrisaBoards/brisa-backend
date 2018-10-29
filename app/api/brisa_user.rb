@@ -8,7 +8,7 @@ class BrisaUser < BrisaAPIBase
   api_action 'logout', args: %w()
 
   def self.groups(params, user, ctx)
-    raise BrisaAPIError.new('Access denied') unless user
+    raise BrisaApiError.new('Access denied') unless user
     (UserGroup.where(owner_uid: user.uid) +
       UserGroup.where("access -> ? is not null", user.uid.to_s)).map &:to_json
   end
@@ -16,23 +16,22 @@ class BrisaUser < BrisaAPIBase
   def self.status(params, user, ctx)
     token =  params[:auth_token]
     if user
+      result = { id: user.id, uid: user.uid, alias: user.alias, email: user.email, admin: user.admin, logged_in: true }
       if params[:renew]
-        token = create_token(user.id)
+        result['auth_token'] = create_token(user.id)
       end
-      return { id: user.id, uid: user.uid, alias: user.alias, email: user.email, admin: user.admin, logged_in: true, auth_token: token }
+      return result
     end
     return { logged_in: false}
   end
 
   def self.login(params, user, ctx)
     if u = User.where(email: params[:email]).first
-      if BCrypt::Password.new(u.encrypted_password) == params[:password]
+      if u.check_password(params[:password])
         if u.disabled?
           raise BrisaApiError.new((u.disabled_message || '').empty? ? 'Account Disabled' : u.disabled_message)
         end
         token = create_token(u.id)
-        puts "Encode token with #{Rails.application.credentials.secret_key_base}"
-        #ctx.session[:user_id] = u.id
         return self.status({}, u, ctx).merge({auth_token: token})
       end
     end
@@ -44,7 +43,7 @@ class BrisaUser < BrisaAPIBase
     return self.status(params, nil, ctx)
   end
 
-  def self.create_token(user_id, exp=1.day.from_now)
+  def self.create_token(user_id, exp=2.days.from_now)
     token_info = {user_id: user_id}
     token_info[:exp] = exp.to_i
     return JWT.encode(token_info, Rails.application.credentials.secret_key_base)

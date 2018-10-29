@@ -2,7 +2,7 @@
 class BrisaController < ApplicationController
   # TODO: Refactor API so functions are included directly in controller
   # and has access to all controller data.
-  BrisaEntry; BrisaUser; BrisaModel; BrisaUserSetting; BrisaGroup;
+  BrisaEntry; BrisaUser; BrisaModel; BrisaUserSetting; BrisaGroup; BrisaRole
 
   skip_before_action :verify_authenticity_token
 
@@ -26,16 +26,16 @@ private
     if params[:auth_token]
       begin
         token_data = JWT.decode(params[:auth_token], Rails.application.credentials.secret_key_base)[0]
-        return User.where(id: token_data['user_id']).first
+        if token_data['user_id']
+          return User.where(id: token_data['user_id']).first
+        elsif token_data['rol']
+          role = Role.where(id: token_data['rol']).first
+          return User.where(id: role.user_id).first if role
+        end
       rescue StandardError => e
         logger.info(e)
-        return nil
       end
-    end
-
-    return nil
-    if session[:user_id]
-      return User.where(id: session[:user_id]).first
+      return nil
     end
 
     return nil

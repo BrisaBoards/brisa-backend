@@ -3,6 +3,9 @@ require 'bcrypt'
 class User < ApplicationRecord
   before_create :assign_uid
 
+  def check_password(password)
+    BCrypt::Password.new(encrypted_password) == password
+  end
   def assign_uid
     self.uid = SecureRandom.hex(8)
   end
