@@ -8,6 +8,11 @@ default: &default
 
 development:
   <<: *default
+  host: <%= ENV['DB_HOST'] || 'localhost' %>
+  port: 5432
+  database: <%= ENV['DB_NAME'] || 'brisa-app' %>
+  username: <%= ENV['DB_USER'] || 'brisa-app' %>
+  password: <%= ENV['DB_PASS'] %>
 
 # Warning: The database defined as "test" will be erased and
 # re-generated from your development database when you run "rake".
