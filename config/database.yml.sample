@@ -17,10 +17,9 @@ test:
 
 production:
   <<: *default
-  host: localhost
+  host: <%= ENV['DB_HOST'] || 'localhost' %>
   port: 5432
-  database: brisa-app-db
-  username: brisa-app-username
-  password: user-password
-
+  database: <%= ENV['DB_NAME'] || 'brisa-app' %>
+  username: <%= ENV['DB_USER'] || 'brisa-app' %>
+  password: <%= ENV['DB_PASS'] %>
 
