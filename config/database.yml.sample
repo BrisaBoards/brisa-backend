@@ -17,7 +17,7 @@ test:
 
 production:
   <<: *default
-  host: 10.184.187.158
+  host: localhost
   port: 5432
   database: brisa-app-db
   username: brisa-app-username
