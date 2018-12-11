@@ -3,9 +3,25 @@ class BrisaUser < BrisaAPIBase
   api_object 'User', attrs: %w(alias admin)
 
   api_action 'status', args: %w(renew)
+  api_action 'update_account', args: %w(alias)
+  api_action 'change_pass', args: %w(password new_password)
   api_action 'login', args: %w(email password), returns: 'User'
   api_action 'groups', args: %w(), returns: ['Group']
   api_action 'logout', args: %w()
+
+  def self.update_account(params, user, ctx)
+    raise BrisaApiError.new('Access denied') unless user
+    user.update(alias: params[:alias])
+    return true
+  end
+
+  def self.change_pass(params, user, ctx)
+    raise BrisaApiError.new('Access denied') unless user
+    raise BrisaApiError.new('Current password does not match.') unless user.check_password(params[:password])
+    user.set_password(params[:new_password])
+    user.save
+    return true
+  end
 
   def self.groups(params, user, ctx)
     raise BrisaApiError.new('Access denied') unless user
