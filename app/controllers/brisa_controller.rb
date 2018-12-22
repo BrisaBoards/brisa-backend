@@ -1,3 +1,4 @@
+require './lib/brisa_jwt'
 
 class BrisaController < ApplicationController
   # TODO: Refactor API so functions are included directly in controller
@@ -24,6 +25,7 @@ private
 
   def current_user
     if params[:auth_token]
+      return BrisaJWT.check_token(params[:auth_token])
       begin
         token_data = JWT.decode(params[:auth_token], Rails.application.credentials.secret_key_base)[0]
         if token_data['user_id']

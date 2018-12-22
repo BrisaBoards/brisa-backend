@@ -71,7 +71,7 @@ class Brisa<%= obj %>Parent
   def <%= act %>(<%= Array(action[:args]).join(', ') %>)
     send_args = { <%= action[:args].map {|a| "#{a}: #{a}" }.join(", ") %> }
     @brisa.HandleResult(@brisa.request('<%= obj %>:<%= act %>', send_args),
-        <%= ActionReturnType(action, 'nil') %>, <%= action[:returns].is_a?(Array) ? 'true' : 'false' %>)
+        <%= ActionReturnType(action, 'nil', 'Brisa', obj) %>, <%= action[:returns].is_a?(Array) ? 'true' : 'false' %>)
   end
 <% end %>
 end

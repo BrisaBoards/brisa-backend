@@ -18,17 +18,17 @@ module LibraryGeneratorHelper
   def InstanceArgs(opts)
     rem_args = Array(opts[:instance]) + Array(opts[:include_data])
     arg_list = opts[:args] - rem_args.map(&:to_s)
-    puts "InstArgs: (#{arg_list.join(",")})" + opts.inspect + " -- #{rem_args}"
+    #puts "InstArgs: (#{arg_list.join(",")})" + opts.inspect + " -- #{rem_args}"
     return arg_list
   end
 
-  def ActionReturnType(opts, lang_null='null', cls_prefix='Brisa')
+  def ActionReturnType(opts, lang_null='null', cls_prefix='Brisa', cls=nil)
     if opts[:returns].is_a? Array
       return cls_prefix + opts[:returns][0]
     elsif opts[:returns] == :data or opts[:returns].nil?
       return lang_null
     elsif opts[:returns] == :self
-      return lang_null
+      return cls ? cls_prefix + cls : lang_null
     else
       return cls_prefix + opts[:returns]
     end

@@ -1,10 +1,12 @@
+production:
+  adapter: <%= ENV['BRISA_WS_REDIS'] ? 'redis' : 'async' %>
+  url: <%= ENV.fetch("REDIS_URL") { "redis://localhost:6379/1" } %>
+  channel_prefix: brisa
+
 development:
-  adapter: async
+  adapter: <%= ENV['BRISA_WS_REDIS'] ? 'redis' : 'async' %>
+  url: <%= ENV.fetch("REDIS_URL") { "redis://localhost:6379/1" } %>
+  channel_prefix: brisa-dev
 
 test:
   adapter: async
-
-production:
-  adapter: redis
-  url: <%= ENV.fetch("REDIS_URL") { "redis://localhost:6379/1" } %>
-  channel_prefix: brisa-backend_production

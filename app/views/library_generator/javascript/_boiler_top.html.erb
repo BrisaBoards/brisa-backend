@@ -64,7 +64,7 @@ BrisaAPI.<%= obj %> = function(state) { this.data = state;};
 %>
 BrisaAPI.<%= obj %>.<%= act %> = function(<%= Array(action[:args]).join(', ') %>) {
   var args = { <%= action[:args].map {|a| "#{a}: #{a}" }.join(", ") %> };
-  return BrisaAPI.SendRequest('<%= obj %>:<%= act %>', args, <%= ActionReturnType(action, 'null', 'BrisaAPI.') %>, <%= action[:returns].is_a?(Array) ? 'true' : 'false' %>);
+  return BrisaAPI.SendRequest('<%= obj %>:<%= act %>', args, <%= ActionReturnType(action, 'null', 'BrisaAPI.', obj) %>, <%= action[:returns].is_a?(Array) ? 'true' : 'false' %>);
 };
 
 <% end %>

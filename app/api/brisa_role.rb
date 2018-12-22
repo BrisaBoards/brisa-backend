@@ -35,14 +35,6 @@ class BrisaRole < BrisaAPIBase
     raise BrisaApiError.new('Access denied') unless role.user_id == user.id
     raise BrisaApiError.new('Access denied') unless user.check_password(params[:password])
     exp = params[:exp].nil? ? nil : Time.parse(params[:exp])
-    return { auth_token: self.create_token(role.id, params[:exp]) }
-  end
-
-  def self.create_token(role_id, exp)
-    token_info = {rol: role_id}
-    if exp
-      token_info[:exp] = exp.to_i
-    end
-    return JWT.encode(token_info, Rails.application.credentials.secret_key_base)
+    return { auth_token: BrisaJWT.create_token(role.id, params[:exp], true) }
   end
 end
