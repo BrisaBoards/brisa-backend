@@ -15,6 +15,7 @@ class Comment < ApplicationRecord
     msg = {
       m: 'cmt',
       a: action,
+      g: self.entry.group_id,
       ent: self.entry_id,
       id: self.id,
     }

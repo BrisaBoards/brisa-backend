@@ -37,11 +37,20 @@ class BrisaComment < BrisaAPIBase
   end
 
   def self.find(params, user, ctx)
-
+    raise BriaApiError.new('Access denied') unless user
+    comment = Comment.find(params[:id])
+    raise BrisaApiError.new('Access denied') unless comment.entry.view?(user)
+    comment.to_api
   end
 
   def self.destroy(params, user, ctx)
-
+    raise BriaApiError.new('Access denied') unless user
+    comment = Comment.find(params[:id])
+    raise BrisaApiError.new('Access denied') unless comment.user_uid == user.uid
+    # TODO: If other comments match entry_id and reply_to == 'comment.<id>',
+    # mark as deleted and clear data so there's a placeholder.
+    comment.destroy
+    comment.to_api
   end
 
 end

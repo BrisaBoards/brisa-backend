@@ -42,6 +42,7 @@ class BrisaUser < BrisaAPIBase
   end
 
   def self.login(params, user, ctx)
+    # TODO: Add rate limiting by IP and e-mail.
     if u = User.where(email: params[:email]).first
       if u.check_password(params[:password])
         if u.disabled?
