@@ -12,13 +12,21 @@ class Entry < ApplicationRecord
   end
   def comment?(user)
     return true if user.uid == self.owner_uid
-    return true if self.user_group and self.user_group.view?(user)
+    return true if self.user_group and self.user_group.comment?(user)
     return false
   end
   def admin?(user)
     return true if user.uid == self.owner_uid
     return true if self.user_group and self.user_group.admin?(user)
     return false
+  end
+
+  def user_uids
+    if self.group_id.nil?
+      return [self.owner_uid]
+    end
+
+    return ([self.owner_uid] + self.user_group.access.keys).uniq
   end
 
   def ws_message(action, session_id=nil)
@@ -32,14 +40,6 @@ class Entry < ApplicationRecord
     }
     msg[:sid] = session_id if session_id
     return msg
-  end
-
-  def user_uids
-    if self.group_id.nil?
-      return [self.owner_uid]
-    end
-
-    return ([self.owner_uid] + self.user_group.access.keys).uniq
   end
 
   def broadcast(action, session_id=nil)

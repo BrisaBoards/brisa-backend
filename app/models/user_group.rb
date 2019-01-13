@@ -19,6 +19,10 @@ class UserGroup < ApplicationRecord
     return true if self.access[user.uid] == 'edit' or self.access[user.uid] == 'admin'
     return false
   end
+  def comment?(user)
+    return true if user.uid == self.owner_uid
+    return true if self.edit?(user) or self.access[user.uid] == 'comment'
+  end
   def view?(user)
     return true if user.uid == self.owner_uid
     return true if self.access[user.uid]

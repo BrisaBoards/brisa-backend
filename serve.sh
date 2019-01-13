@@ -2,4 +2,4 @@
 
 source ./environment.local
 cd $(dirname $0)
-~/.rvm/wrappers/default/puma
+~/.rvm/wrappers/default/puma $@

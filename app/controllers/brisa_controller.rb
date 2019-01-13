@@ -3,7 +3,7 @@ require './lib/brisa_jwt'
 class BrisaController < ApplicationController
   # TODO: Refactor API so functions are included directly in controller
   # and has access to all controller data.
-  BrisaEntry; BrisaUser; BrisaModel; BrisaUserSetting; BrisaGroup; BrisaRole
+  BrisaEntry; BrisaUser; BrisaModel; BrisaUserSetting; BrisaGroup; BrisaRole; BrisaComment
 
   skip_before_action :verify_authenticity_token
 
