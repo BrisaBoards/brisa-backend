@@ -1,7 +1,7 @@
 class BrisaEntry < BrisaAPIBase
   api_namespace 'Brisa0'
   api_object 'Entry', attrs: %w(title group_id owner_uid creator_uid description
-      metadata tags classes created_at updated_at)
+      metadata tags classes created_at updated_at comment_count)
 
   api_action 'find', args: %w(id), returns: :self, instance: :id
   api_action 'updates', args: %w(since), returns: :data
@@ -14,7 +14,7 @@ class BrisaEntry < BrisaAPIBase
   api_action 'destroy', args: %w(id), instance: :id
 
   def self.find(params, user, ctx)
-    entry = Entry.find(params[:id])
+    entry = Entry.comment_counts.find(params[:id])
     raise BrisaApiError.new('Access denied') unless entry.edit?(user)
     entry
   end
@@ -37,7 +37,7 @@ class BrisaEntry < BrisaAPIBase
   end
 
   def self.add_tags(params, user, ctx)
-    entry = Entry.find(params['id'])
+    entry = Entry.comment_counts.find(params['id'])
     raise BrisaApiError.new('Access denied') unless entry.edit?(user)
     Array(params['tags']).each do |tag|
       entry.tags.push(tag) unless entry.tags.find_all {|t| t.downcase == tag.downcase}.length > 0
@@ -48,7 +48,7 @@ class BrisaEntry < BrisaAPIBase
   end
 
   def self.remove_tags(params, user, ctx)
-    entry = Entry.find(params['id'])
+    entry = Entry.comment_counts.find(params['id'])
     raise BrisaApiError.new('Access denied') unless entry.edit?(user)
     Array(params['tags']).each do |tag|
       tag = tag.downcase
@@ -59,7 +59,7 @@ class BrisaEntry < BrisaAPIBase
     entry
   end
   def self.edit_class(params, user, ctx)
-    entry = Entry.find(params['id'])
+    entry = Entry.comment_counts.find(params['id'])
     raise BrisaApiError.new('Access denied') unless entry.edit?(user)
     
     entry.classes ||= []
@@ -70,7 +70,7 @@ class BrisaEntry < BrisaAPIBase
     entry
   end
   def self.destroy(params, user, ctx)
-    entry = Entry.find(params['id'])
+    entry = Entry.comment_counts.find(params['id'])
     raise BrisaApiError.new('Access denied') unless entry.edit?(user)
     entry.destroy
     entry.broadcast(:destroy, params[:sid])
@@ -83,7 +83,7 @@ class BrisaEntry < BrisaAPIBase
       raise BrisaApiError.new('Group not found') unless group
       raise BrisaApiError.new('Access denied') unless group.view?(user)
     end
-    result = Entry.all
+    result = Entry.all.comment_counts
     if params['tags']
       if params['tags'].length == 0
         result = result.where('cardinality(tags) = 0')
@@ -124,7 +124,7 @@ class BrisaEntry < BrisaAPIBase
   end
 
   def self.update(params, user, ctx)
-    entry = Entry.find(params[:id])
+    entry = Entry.comment_counts.find(params[:id])
     raise BrisaApiError.new('Access denied') unless entry.edit?(user)
     data = params.require(:data)
     entry.update(title: data[:title], description: data[:description],

@@ -1,5 +1,13 @@
 class Entry < ApplicationRecord
   belongs_to :user_group, foreign_key: :group_id, optional: true
+  has_many :comments
+
+  def self.comment_counts
+    joins('left join comments on comments.entry_id = entries.id').
+    select('entries.*, count(comments.id) as comment_count').
+    group('entries.id')
+  end
+
   def edit?(user)
     return true if user.uid == self.owner_uid
     return true if self.user_group and self.user_group.edit?(user)
