@@ -49,6 +49,7 @@ class BrisaComment < BrisaAPIBase
     raise BrisaApiError.new('Access denied') unless comment.user_uid == user.uid
     # TODO: If other comments match entry_id and reply_to == 'comment.<id>',
     # mark as deleted and clear data so there's a placeholder.
+    comment.broadcast(:destroy, params[:sid])
     comment.destroy
     comment.to_api
   end

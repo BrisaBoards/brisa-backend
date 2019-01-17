@@ -15,9 +15,9 @@ class Comment < ApplicationRecord
     msg = {
       m: 'cmt',
       a: action,
-      g: self.entry.group_id,
-      ent: self.entry_id,
-      id: self.id,
+      gid: self.entry.group_id,
+      id: self.entry_id,
+      cmt: self.id,
     }
     msg[:sid] = session_id if session_id
     return msg
