@@ -8,7 +8,7 @@ class UserGroup < ApplicationRecord
   def to_json
     json = { id: id, name: name, owner_uid: owner_uid,
       settings: settings, created_at: created_at, updated_at: updated_at }
-    json[:access] = access.map do |k,v|
+    json[:access] = [share_json(owner_uid, :admin)] + access.map do |k,v|
       share_json(k,v)
     end
     return json

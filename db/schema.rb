@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2019_01_11_063340) do
+ActiveRecord::Schema.define(version: 2019_02_19_203654) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -37,11 +37,26 @@ ActiveRecord::Schema.define(version: 2019_01_11_063340) do
     t.jsonb "metadata"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.string "watchers", default: [], array: true
+    t.string "assignees", default: [], array: true
+    t.index ["assignees"], name: "index_entries_on_assignees"
     t.index ["classes"], name: "index_entries_on_classes", using: :gin
     t.index ["creator_uid"], name: "index_entries_on_creator_uid"
     t.index ["group_id"], name: "index_entries_on_group_id"
     t.index ["owner_uid"], name: "index_entries_on_owner_uid"
     t.index ["tags"], name: "index_entries_on_tags", using: :gin
+  end
+
+  create_table "notifications", force: :cascade do |t|
+    t.integer "user_id"
+    t.string "parent"
+    t.string "ctx"
+    t.jsonb "messages"
+    t.boolean "is_read"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["parent"], name: "index_notifications_on_parent"
+    t.index ["user_id"], name: "index_notifications_on_user_id"
   end
 
   create_table "roles", force: :cascade do |t|

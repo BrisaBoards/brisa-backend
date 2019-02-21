@@ -4,6 +4,7 @@ class BrisaUser < BrisaAPIBase
 
   api_action 'status', args: %w(renew)
   api_action 'update_account', args: %w(alias)
+  api_action 'find', args: %w(uid), returns: 'User'
   api_action 'change_pass', args: %w(password new_password)
   api_action 'login', args: %w(email password), returns: 'User'
   api_action 'groups', args: %w(), returns: ['Group']
@@ -13,6 +14,13 @@ class BrisaUser < BrisaAPIBase
     raise BrisaApiError.new('Access denied') unless user
     user.update(alias: params[:alias])
     return true
+  end
+
+  def self.find(params, user, ctx)
+    raise BrisaApiError.new('Access denied') unless user
+    u = User.where(uid: params[:uid]).first
+    raise BrisaApiError.new('Not found') unless u
+    return {alias: u.alias, uid: u.uid}
   end
 
   def self.change_pass(params, user, ctx)

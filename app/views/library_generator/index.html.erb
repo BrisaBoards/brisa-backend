@@ -13,11 +13,11 @@
 
   <% @dispatcher.ns[ns].objects.keys.each do |obj| %>
     <div style="margin-left: 10px;">
-    <h4><%= obj %> { <%= @dispatcher.ns[ns].objects[obj].opts[:attrs].join(", ") %> }</h4>
+    <h4><%= obj %> ( <%= @dispatcher.ns[ns].objects[obj].opts[:attrs].join(", ") %> )</h4>
 
     <% @dispatcher.ns[ns].objects[obj].actions.keys.each do |act| %>
-      <div style="margin-left: 10px;"><%= act %>
-        { <%= @dispatcher.ns[ns].objects[obj].actions[act][:opts][:args].join(", ") %> }
+      <div style="margin-left: 10px;"><%= act %>(
+        <%= @dispatcher.ns[ns].objects[obj].actions[act][:opts][:args].join(", ") %> )
         <%# @dispatcher.ns[ns].objects[obj].actions[act][:opts] %></div>
     <% end %>
     </div>

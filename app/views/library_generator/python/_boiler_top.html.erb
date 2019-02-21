@@ -79,7 +79,7 @@ class Brisa<%= obj %>:
       }.join(", ").html_safe
     %> }
     return self.brisa.HandleResult(self.brisa.request('<%= obj %>:<%= method %>', send_args),
-        <%= ActionReturnType(attrs, 'nil') %>, <%= attrs[:returns].is_a?(Array) ? 'True' : 'False' -%>
+        <%= ActionReturnType(attrs, 'None') %>, <%= attrs[:returns].is_a?(Array) ? 'True' : 'False' -%>
 <%= attrs[:returns] == :self ? ', self' : '' %>)
 
 <% end %>

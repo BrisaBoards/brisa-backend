@@ -72,7 +72,7 @@ BrisaAPI.<%= obj %>.<%= act %> = function(<%= Array(action[:args]).join(', ') %>
 <% end %>
 
 <% @objs.each do |obj| %>
-BrisaAPI.<%= obj %>.prototype.id = function() { return this.data,id }
+BrisaAPI.<%= obj %>.prototype.id = function() { return this.data.id }
 
 <% (@ns.objects[obj].opts[:attrs] || []).each do |attr| %>
 BrisaAPI.<%= obj %>.prototype.<%= attr %> = function(new_val) {

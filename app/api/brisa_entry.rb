@@ -1,17 +1,57 @@
+load './lib/brisa_notifier.rb'
+
 class BrisaEntry < BrisaAPIBase
   api_namespace 'Brisa0'
   api_object 'Entry', attrs: %w(title group_id owner_uid creator_uid description
-      metadata tags classes created_at updated_at comment_count)
+      metadata tags classes created_at updated_at comment_count),
+      desc: ""
 
-  api_action 'find', args: %w(id), returns: :self, instance: :id
-  api_action 'updates', args: %w(since), returns: :data
-  api_action 'search', args: %w(tags classes group_id), returns: ['Entry']
-  api_action 'create', args: %w(data), returns: 'Entry'
-  api_action 'update', args: %w(id data), instance: :id, include_data: :data, returns: :self
-  api_action 'add_tags', args: %w(id tags), instance: :id, returns: :self
-  api_action 'remove_tags', args: %w(id tags), instance: :id, returns: :self
-  api_action 'edit_class', args: %w(id class_name cfg), instance: :id, returns: :self
-  api_action 'destroy', args: %w(id), instance: :id
+  api_action 'find', args: %w(id), returns: :self, instance: :id, desc: "Find an entry by id."
+  api_action 'updates', args: %w(since), returns: :data, desc: "List all changes after a specified time."
+  api_action 'search', args: %w(tags classes group_id), returns: ['Entry'], desc: "Search for entries matching a set of tags and classes within a group."
+  api_action 'create', args: %w(data), returns: 'Entry', desc: "Create a new entry."
+  api_action 'update', args: %w(id data), instance: :id, include_data: :data, returns: :self, desc: "Update all entry data."
+  api_action 'assign', args: %w(id uid assign ctx is_role), instance: :id, returns: :data, desc: "Add or remove assignee."
+  api_action 'watch', args: %w(id watch), instance: :id, returns: :data, desc: "Watch (or unwatch) entry."
+  api_action 'add_tags', args: %w(id tags), instance: :id, returns: :self, desc: "Add a tag (or tags) to an entry."
+  api_action 'remove_tags', args: %w(id tags), instance: :id, returns: :self, desc: "Remove a tag (or tags) from an entry."
+  api_action 'edit_class', args: %w(id class_name cfg), instance: :id, returns: :self, desc: "Add (or update) a class and associated metadata."
+  api_action 'destroy', args: %w(id), instance: :id, desc: "Delete entry."
+
+  def self.assign(params, user, ctx)
+    entry = Entry.find(params[:id])
+    raise BrisaApiError.new('Access denied') unless entry.edit?(user)
+    # uid assign
+    if params[:assign]
+      if !entry.assignees.include?(params[:uid])
+        entry.assignees.push params[:uid]
+        BrisaNotifier.EntryAssigned(entry, user, params[:uid], true, !params[:is_role], params[:ctx])
+        entry.save
+      end
+    else
+      if entry.assignees.delete(params[:uid])
+        BrisaNotifier.EntryAssigned(entry, user, params[:uid], false, !params[:is_role], params[:ctx])
+        entry.save
+      end
+    end
+    entry.broadcast(:update, params[:sid])
+    true
+  end
+
+  def self.watch(params, user, ctx)
+    entry = Entry.find(params[:id])
+    raise BrisaApiError.new('Access denied') unless entry.view?(user)
+    # watch
+    if params[:watch]
+      if !entry.watchers.include?(user.uid)
+        entry.watchers.push user.uid
+        entry.save
+      end
+    else
+      entry.save if entry.watchers.delete user.uid
+    end
+    true
+  end
 
   def self.find(params, user, ctx)
     entry = Entry.comment_counts.find(params[:id])
@@ -119,6 +159,8 @@ class BrisaEntry < BrisaAPIBase
       tags: Array(data[:tags]), classes: Array(data[:classes]),
       metadata: data[:metadata]}
     entry = Entry.create!(opts)
+    is_read = !data[:is_role]
+    BrisaNotifier.EntryCreated(entry.user_group, user, is_read, entry, data[:ctx])
     entry.broadcast(:create, params[:sid])
     entry
   end

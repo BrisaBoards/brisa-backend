@@ -1,9 +1,11 @@
+load './lib/brisa_notifier.rb'
+
 class BrisaComment < BrisaAPIBase
   api_namespace 'Brisa0'
   api_object 'Comment', attrs: %w(user_uid comment metadata reply_to)
 
   api_action 'all', args: %w(entry_id), returns: ['Comment']
-  api_action 'find', args: %w(id), returns: ['Comment']
+  api_action 'find', args: %w(id), returns: 'Comment'
   api_action 'create', args: %w(data), returns: 'Comment'
   api_action 'destroy', args: %w(id), instance: :id, returns: 'Comment'
   api_action 'update', args: %w(id data), instance: :id, include_data: :data, returns: :self
@@ -22,6 +24,7 @@ class BrisaComment < BrisaAPIBase
     raise BrisaApiError.new('Access denied') unless entry.comment?(user)
     comment = Comment.create!(user_uid: user.uid, entry_id: entry.id, comment: data[:comment],
         reply_to: data[:reply_to])
+    BrisaNotifier.EntryComment(entry.user_group, user, !data[:is_role], entry, comment, data[:ctx])
     comment.broadcast(:create, params[:sid])
     comment.to_api
   end

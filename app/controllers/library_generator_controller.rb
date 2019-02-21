@@ -1,4 +1,4 @@
-BrisaEntry; BrisaUser; BrisaModel; BrisaUserSetting; BrisaGroup; BrisaRole; BrisaComment
+BrisaEntry; BrisaUser; BrisaModel; BrisaUserSetting; BrisaGroup; BrisaRole; BrisaComment; BrisaNotification
 
 class LibraryGeneratorController < ApplicationController
   LANGUAGES = %w(javascript ruby python)

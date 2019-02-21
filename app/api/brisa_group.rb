@@ -3,6 +3,7 @@ class BrisaGroup < BrisaAPIBase
   api_object 'Group', attrs: %w(name id settings owner_uid access)
 
   api_action 'create', args: %w(name), returns: 'Group'
+  api_action 'find', args: %w(id), instance: :id, returns: :self
   api_action 'add_share', args: %w(id email access), instance: :id, returns: :self
   api_action 'remove_share', args: %w(id email), instance: :id, returns: :data
   api_action 'shares', args: %w(id), instance: :id, returns: :data
@@ -11,6 +12,13 @@ class BrisaGroup < BrisaAPIBase
   def self.create(params, user, ctx)
     raise BrisaApiError.new('Access denied') unless user
     UserGroup.create(name: params[:name], owner_uid: user.uid, access: {}, settings: {})
+  end
+
+  def self.find(params, user, ctx)
+    raise BrisaApiError.new('Access denied') unless user
+    group = UserGroup.find(params[:id])
+    raise BrisaApiError.new('Access denied') unless group.view?(user)
+    group.to_json
   end
 
   def self.add_share(params, user, ctx)
