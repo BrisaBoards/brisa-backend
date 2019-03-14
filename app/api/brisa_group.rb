@@ -42,6 +42,11 @@ class BrisaGroup < BrisaAPIBase
   end
 
   def self.setting(params, user, ctx)
-    params[:value]
+    raise BrisaApiError.new('Access denied') unless user
+    group = UserGroup.find(params[:id])
+    raise BrisaApiError.new('Access denied') unless group.edit?(user)
+    group.settings[params[:name]] = params[:value]
+    group.save
+    true
   end
 end
