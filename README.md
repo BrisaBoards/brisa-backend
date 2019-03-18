@@ -11,7 +11,7 @@ backend together.
 ### Requirements
 
 The backend is written in Ruby on Rails 5, and Ruby version 2.5. The backend also requires PostgreSQL
-version 9 or higher due to the use of array and jsonb columns.
+version 9 or higher due to the use of array and jsonb columns. Redis is recommended for live updates.
 
 ### Setup Process
 
