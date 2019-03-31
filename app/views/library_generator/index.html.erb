@@ -15,10 +15,15 @@
     <div style="margin-left: 10px;">
     <h4><%= obj %> ( <%= @dispatcher.ns[ns].objects[obj].opts[:attrs].join(", ") %> )</h4>
 
-    <% @dispatcher.ns[ns].objects[obj].actions.keys.each do |act| %>
-      <div style="margin-left: 10px;"><%= act %>(
+    <% @dispatcher.ns[ns].objects[obj].actions.keys.each do |act|
+      action = @dispatcher.ns[ns].objects[obj].actions[act]
+      %>
+      <div style="margin-left: 10px; margin-top: 10px">
+        <% if action[:opts][:desc] %><small># <%= action[:opts][:desc] %></small><br/><% end %>
+        <%= act %>(
         <%= @dispatcher.ns[ns].objects[obj].actions[act][:opts][:args].join(", ") %> )
-        <%# @dispatcher.ns[ns].objects[obj].actions[act][:opts] %></div>
+        <%# @dispatcher.ns[ns].objects[obj].actions[act][:opts] %>
+      </div>
     <% end %>
     </div>
   <% end %>

@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2019_02_19_203654) do
+ActiveRecord::Schema.define(version: 2019_03_24_003506) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -39,6 +39,11 @@ ActiveRecord::Schema.define(version: 2019_02_19_203654) do
     t.datetime "updated_at", null: false
     t.string "watchers", default: [], array: true
     t.string "assignees", default: [], array: true
+    t.boolean "archived"
+    t.datetime "due_at"
+    t.datetime "start_at"
+    t.integer "time_est"
+    t.datetime "completed_at"
     t.index ["assignees"], name: "index_entries_on_assignees"
     t.index ["classes"], name: "index_entries_on_classes", using: :gin
     t.index ["creator_uid"], name: "index_entries_on_creator_uid"

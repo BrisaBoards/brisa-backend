@@ -13,8 +13,7 @@ class BrisaController < ApplicationController
     begin
       render json: {data: BrisaApiDispatcher.singleton.do_call(params, current_user, self, params[:namespace])}
     rescue BrisaApiError => e
-      # TODO: Refactor exceptions to include an error code (:not_found, :access_denied, etc)
-      render status: :bad_request, json: e.error_data
+      render status: e.error_code, json: e.error_data
     rescue StandardError => e
       render status: :internal_server_error, json: {error: Rails.env == 'development' ? "Internal error: #{e.message}" : 'Internal error'}
       raise e

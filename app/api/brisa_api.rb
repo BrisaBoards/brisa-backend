@@ -1,13 +1,11 @@
 # A simple, action-based API and dispatcher that can self-document.
 
 class BrisaApiError < StandardError
-  def initialize(message, error_data={})
-    error_data[:error] = message
+  attr_accessor :error_data, :error_code
+  def initialize(message, error_code=:bad_request, error_data={})
+    error_data[:error] = message unless error_data[:error]
+    @error_code = error_code
     @error_data = error_data
-  end
-
-  def error_data
-    return @error_data
   end
 end
 

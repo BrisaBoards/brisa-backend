@@ -11,6 +11,7 @@ class BrisaEntry < BrisaAPIBase
   api_action 'search', args: %w(tags classes group_id), returns: ['Entry'], desc: "Search for entries matching a set of tags and classes within a group."
   api_action 'create', args: %w(data), returns: 'Entry', desc: "Create a new entry."
   api_action 'update', args: %w(id data), instance: :id, include_data: :data, returns: :self, desc: "Update all entry data."
+  api_action 'partial', args: %w(id actions), returns: :self, instance: :id, desc: "Perform actions to make partial entry edits."
   api_action 'assign', args: %w(id uid assign ctx is_role), instance: :id, returns: :data, desc: "Add or remove assignee."
   api_action 'watch', args: %w(id watch), instance: :id, returns: :data, desc: "Watch (or unwatch) entry."
   api_action 'add_tags', args: %w(id tags), instance: :id, returns: :self, desc: "Add a tag (or tags) to an entry."
@@ -101,7 +102,7 @@ class BrisaEntry < BrisaAPIBase
   def self.edit_class(params, user, ctx)
     entry = Entry.comment_counts.find(params['id'])
     raise BrisaApiError.new('Access denied') unless entry.edit?(user)
-    
+
     entry.classes ||= []
     entry.classes.push(params['class_name']) unless entry.classes.include?(params['class_name'])
     entry.metadata[params['class_name']] = params['cfg']
@@ -165,13 +166,34 @@ class BrisaEntry < BrisaAPIBase
     entry
   end
 
+  def self.partial(params, user, ctx)
+    entry = Entry.comment_counts.find(params[:id])
+    raise BrisaApiError.new('Access denied') unless entry.edit?(user)
+
+    # Rails handling of safe params is convoluted, and can't whitelist
+    # an entire structure for jsonb fields.
+    actions = params.to_unsafe_h[:actions]
+    entry.with_lock do
+      actions.each do |act|
+        failed = entry.apply(act)
+        raise BrisaApiError.new(failed[:msg], :error, {a: act}) if failed
+      end
+      entry.save
+    end
+    entry.broadcast(:update, params[:sid])
+    entry
+  end
+
   def self.update(params, user, ctx)
     entry = Entry.comment_counts.find(params[:id])
     raise BrisaApiError.new('Access denied') unless entry.edit?(user)
     data = params.require(:data)
-    entry.update(title: data[:title], description: data[:description],
-      tags: data[:tags], classes: data[:classes],
-      metadata: data[:metadata])
+    entry.with_lock do
+      entry.update(title: data[:title], description: data[:description],
+        tags: data[:tags], classes: data[:classes],
+        metadata: data[:metadata], due_at: data[:due_at], archived: data[:archived],
+        time_est: data[:time_est], completed_at: data[:completed_at])
+    end
     entry.broadcast(:update, params[:sid])
     entry
   end
