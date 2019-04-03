@@ -3,6 +3,7 @@ class Comment < ApplicationRecord
 
   def to_api
     return {
+      id: self.id,
       user: User.where(uid: self.user_uid).map { |u| u.alias }.first,
       user_uid: self.user_uid,
       comment: self.comment,
