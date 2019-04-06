@@ -15,9 +15,18 @@ class UserChannel < ApplicationCable::Channel
     @@update_message ||= nil
     begin
       if @@update_message.nil?
-        @@update_message = JSON.parse(File.open(Rails.root.join('last_update.msg')).read)
+        local_file = Rails.root.join('last_update.msg.local')
+        global_file = Rails.root.join('last_update.msg')
+        local_up = JSON.parse(File.open(local_file).read) if File.exists?(local_file)
+        global_up = JSON.parse(File.open(global_file).read) if File.exists?(global_file)
+        if !local_up.nil? and local_up['s'] >= global_up['s']
+          @@update_message = local_up
+        else
+          @@update_message = global_up
+        end
       end
     rescue => e
+      logger.error(e)
     end
 
     return @@update_message || {}
